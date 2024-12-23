@@ -1,0 +1,109 @@
+.fiche-container {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    border-radius: 10px;
+    color: #333;
+}
+
+.fiche-container * {
+    padding: 5px;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.back-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.fiche-title {
+    font-size: 24px;
+    color: #212529;
+    margin-bottom: 20px;
+}
+
+.loading-text {
+    font-size: 16px;
+    color: #555;
+}
+
+.error-text {
+    color: #e03131;
+    font-weight: bold;
+}
+
+.etudiant-info {
+    margin-top: 20px;
+}
+
+.etudiant-name {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.etudiant-date {
+    font-size: 14px;
+    color: #666;
+}
+
+.notes-title {
+    font-size: 20px;
+    margin-top: 20px;
+}
+
+.notes-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+
+.notes-table th,
+.notes-table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.notes-table th {
+    background-color: #f4f4f4;
+}
+
+.note-row-high {
+    background-color: #d4edda;
+}
+
+.note-row-low {
+    background-color: #f8d7da;
+}
+
+.no-notes {
+    font-size: 14px;
+    margin: 10px 0;
+    color: #666;
+    font-style: italic;
+}
+
+.add-note-link {
+    text-decoration: none;
+}
+
+.add-note-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.add-note-button:hover {
+    background-color: #0056b3;
+}

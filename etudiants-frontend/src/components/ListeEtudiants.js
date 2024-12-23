@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getEtudiants, addEtudiant } from "../api";
 import { Link } from "react-router-dom";
 import FormulaireAjoutEtudiant from "./FormulaireAjoutEtudiant";
+import "./styles/ListeEtudiants.css";
 
 function ListeEtudiants() {
   const [etudiants, setEtudiants] = useState([]);
@@ -27,41 +28,57 @@ function ListeEtudiants() {
       });
   };
 
+  const formattedDate = (etudiant) => new Date(etudiant.dateDeCreation).toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+  });
+
   return (
-    <div>
+    <div className="students-list-form-container">
       <FormulaireAjoutEtudiant onAddEtudiant={handleAddEtudiant} />
-      <h1>Liste des Étudiants</h1>
-      <table border="1">
-        <thead>
-          <tr>
-            <th>Nom</th>
-            <th>Date de Création</th>
-          </tr>
-        </thead>
-        <tbody>
-          {etudiants.length > 0 ? (
-            etudiants.map((etudiant) => (
-              <tr
-                key={etudiant.id}
-                style={{
-                  backgroundColor: etudiant.moyenne > 10 ? "lightgreen" : "lightcoral",
-                }}
-              >
-                <td>
-                  <Link to={`/etudiants/${etudiant.id}`} state={{ etudiant }}>
-                    {etudiant.nom}
-                  </Link>
-                </td>
-                <td>{etudiant.dateDeCreation}</td>
-              </tr>
-            ))
-          ) : (
+      <div className="students-list-container">
+        <h1 className="students-list-title">Liste des étudiants</h1>
+        <table className="students-table">
+          <thead>
             <tr>
-              <td colSpan="2">Aucun étudiant trouvé</td>
+              <th>Nom</th>
+              <th>Date de Création</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {etudiants.length > 0 ? (
+              etudiants.map((etudiant) => (
+                <tr
+                  key={etudiant.id}
+                  className={
+                    etudiant.moyenne > 10
+                      ? "student-row success-row"
+                      : "student-row warning-row"
+                  }
+                >
+                  <td>
+                    <Link
+                      to={`/etudiants/${etudiant.id}`}
+                      state={{ etudiant }}
+                      className="student-link"
+                    >
+                      {etudiant.nom}
+                    </Link>
+                  </td>
+                  <td>{formattedDate(etudiant)}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="2" className="no-students-row">
+                  Aucun étudiant trouvé
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

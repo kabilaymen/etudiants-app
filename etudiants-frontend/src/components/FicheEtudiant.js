@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import { getNotes } from "../api";
+import "./styles/FicheEtudiant.css";
 
 function FicheEtudiant() {
   const { id } = useParams();
@@ -39,23 +40,29 @@ function FicheEtudiant() {
     }
   }, [id, etudiant, notes.length]);
 
+  const formattedDate = (etudiant) => new Date(etudiant.dateDeCreation).toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
   return (
-    <div>
-      <Link to={`/`}>Retour</Link>
-      <h1>Détails de l'Étudiant</h1>
-      {loading && <p>Chargement des données...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className="fiche-container">
+      <Link to={`/`} className="back-link">Retour</Link>
+      <h1 className="fiche-title">Détails de l'étudiant</h1>
+      {loading && <p className="loading-text">Chargement des données...</p>}
+      {error && <p className="error-text">{error}</p>}
 
       {etudiant && !loading && (
-        <>
-          <h2>{etudiant.nom}</h2>
-          <p>Date de Création : {etudiant.dateDeCreation}</p>
-        </>
+        <div className="etudiant-info">
+          <h2 className="etudiant-name">{etudiant.nom}</h2>
+          <p className="etudiant-date">Date de Création : {formattedDate(etudiant)}</p>
+        </div>
       )}
 
-      <h2>Notes</h2>
+      <h2 className="notes-title">Notes</h2>
       {notes.length > 0 ? (
-        <table border="1">
+        <table className="notes-table">
           <thead>
             <tr>
               <th>Cours</th>
@@ -66,9 +73,7 @@ function FicheEtudiant() {
             {notes.map((note) => (
               <tr
                 key={note.id}
-                style={{
-                  backgroundColor: note.valeurDeNote > 10 ? "lightgreen" : "lightcoral",
-                }}
+                className={note.valeurDeNote > 10 ? "note-row-high" : "note-row-low"}
               >
                 <td>{note.nomDuCours}</td>
                 <td>{note.valeurDeNote}</td>
@@ -77,12 +82,12 @@ function FicheEtudiant() {
           </tbody>
         </table>
       ) : (
-        <p>Aucune note disponible</p>
+        <p className="no-notes">Aucune note disponible</p>
       )}
 
       {!error && etudiant && (
-        <Link to={`/etudiants/${id}/ajouter-note`}>
-          <button>Ajouter une Note</button>
+        <Link to={`/etudiants/${id}/ajouter-note`} className="add-note-link">
+          <button className="add-note-button">Ajouter une note</button>
         </Link>
       )}
     </div>
