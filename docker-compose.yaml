@@ -1,0 +1,104 @@
+version: "3.9"  # Version Docker Compose compatible avec Docker Swarm
+
+services:
+  # Service de la base de données PostgreSQL
+  db:
+    image: localhost:5000/etudiants-database
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "0.5"  # Limite à 0.5 CPU par conteneur pour éviter les surcharges
+          memory: 512M  # Limite la mémoire à 512 Mo pour chaque réplique
+        reservations:
+          cpus: "0.2"  # Réserve 0.2 CPU pour garantir que le service ait toujours suffisamment de ressources
+          memory: 256M  # Réserve 256 Mo de mémoire pour le bon fonctionnement du service
+      restart_policy:
+        condition: on-failure  # Redémarre le conteneur en cas de défaillance
+        delay: 5s  # Délai avant de redémarrer après un échec
+        max_attempts: 3  # Nombre maximal de tentatives avant d'abandonner
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: randomR@@T1050
+      POSTGRES_DB: etudiants_db
+    volumes:
+      - etudiants_data:/var/lib/postgresql/data  # Persistance des données de la base de données
+    networks:
+      - mega_reseau  # Assigner le service à un réseau commun
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d etudiants_db"]
+      interval: 10s  # Teste la connexion à la base de données toutes les 10 secondes
+      timeout: 5s  # Timeout pour chaque test de 5 secondes
+      retries: 5  # Réessaye 5 fois avant d'indiquer un échec
+      start_period: 20s  # Démarre le test de santé après 20 secondes d'exécution
+
+  # Service Backend
+  backend:
+    image: localhost:5000/etudiants-backend
+    deploy:
+      replicas: 2  # Spécifie 2 réplicas pour garantir la haute disponibilité
+      resources:
+        limits:
+          cpus: "0.5"  # Limite à 0.5 CPU par conteneur pour éviter la surcharge du système
+          memory: 512M  # Limite la mémoire à 512 Mo pour chaque réplique
+        reservations:
+          cpus: "0.2"  # Réserve 0.2 CPU pour chaque réplique du backend
+          memory: 256M  # Réserve 256 Mo de mémoire pour chaque réplique du backend
+      restart_policy:
+        condition: on-failure  # Redémarre le service si le conteneur échoue
+        delay: 10s  # Délai de redémarrage
+        max_attempts: 5  # Nombre maximal de tentatives avant l'abandon
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/etudiants_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: randomR@@T1050
+    networks:
+      - mega_reseau  # Assigner le backend à un réseau interne pour la communication entre services
+
+  # Service Frontend
+  frontend:
+    image: localhost:5000/etudiants-frontend
+    deploy:
+      replicas: 2  # Assure 2 réplicas du frontend pour la haute disponibilité
+      resources:
+        limits:
+          cpus: "0.25"  # Limite à 0.25 CPU pour ne pas monopoliser les ressources
+          memory: 256M  # Limite la mémoire à 256 Mo pour chaque réplique
+        reservations:
+          cpus: "0.1"  # Réserve 0.1 CPU pour garantir une allocation minimale
+          memory: 128M  # Réserve 128 Mo de mémoire pour chaque réplique
+      restart_policy:
+        condition: on-failure  # Redémarre le service en cas de défaillance
+        delay: 10s  # Délai avant redémarrage
+        max_attempts: 5  # Nombre d'échecs avant l'abandon
+    networks:
+      - mega_reseau  # Le frontend est également connecté à ce réseau
+
+  # Reverse Proxy (Nginx ou Traefik pour diriger les requêtes vers le bon service)
+  reverse-proxy:
+    image: nginx:latest
+    deploy:
+      replicas: 1  # Un seul proxy suffisant pour gérer tout le trafic entrant
+      resources:
+        limits:
+          cpus: "0.5"  # Limite l'utilisation du CPU pour le proxy
+          memory: 128M  # Limite l'utilisation de la mémoire pour le proxy
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Chargement de la configuration Nginx pour gérer le routage
+    networks:
+      - mega_reseau  # Le proxy est connecté au même réseau interne
+    ports:
+      - "80:80"  # Redirige les requêtes HTTP entrantes vers le proxy
+
+# Réseau pour connecter tous les services entre eux
+networks:
+  mega_reseau:
+    driver: overlay  # Le driver "overlay" permet la communication entre services sur différents hôtes
+    attachable: true  # Permet d'attacher des conteneurs supplémentaires au réseau si nécessaire
+
+# Volumes pour la persistance des données
+volumes:
+  etudiants_data:
+    external: true  # Indique que ce volume existe déjà et ne doit pas être modifié par Docker Swarm

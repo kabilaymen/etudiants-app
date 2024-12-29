@@ -1,0 +1,43 @@
+# Dépendances
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Build et cache
+/build
+/dist
+/.next
+.cache
+.env
+.env.local
+.env.*.local
+
+# Système et IDE
+.git
+.gitignore
+.DS_Store
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Tests et documentation
+/coverage
+/doc
+README.md
+*.md
+*.log
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*
+
+# Divers
+.npm
+.eslintcache
+*.pem
