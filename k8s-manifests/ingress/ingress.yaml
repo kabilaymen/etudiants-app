@@ -3,16 +3,14 @@ kind: Ingress
 metadata:
   name: app-ingress
   namespace: exam
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2  # Ensure proper path is forwarded after /api
 spec:
   ingressClassName: nginx  # Ingress class
   rules:
   - host: app.test
     http:
       paths:
-      - path: /api/(.*)  # Matches anything starting with /api, e.g., /api/etudiants
-        pathType: ImplementationSpecific
+      - path: /api/  # Matches anything starting with /api
+        pathType: Prefix
         backend:
           service:
             name: backend
