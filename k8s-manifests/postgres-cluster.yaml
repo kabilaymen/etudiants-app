@@ -1,0 +1,15 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: app-db-cluster
+spec:
+  instances: 2
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 1Gi
+  bootstrap:
+    initdb:
+      database: appdatabase
+      owner: app
+      secret:
+        name: app-db-secret

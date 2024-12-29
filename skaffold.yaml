@@ -1,0 +1,42 @@
+apiVersion: skaffold/v4beta6
+kind: Config
+metadata:
+  name: etudiants-app
+build:
+  artifacts:
+    - image: etudiants-frontend
+      context: etudiants-frontend
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.js'
+            dest: /usr/share/nginx/html
+          - src: 'src/**/*.css'
+            dest: /usr/share/nginx/html
+          - src: 'src/**/*.jsx'
+            dest: /usr/share/nginx/html
+    - image: etudiants-backend
+      context: etudiants-backend
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/main/resources/**/*'
+            dest: /app/resources
+deploy:
+  helm:
+    releases:
+    - name: etudiants-app
+      chartPath: helm/etudiants-app
+      valuesFiles:
+      - helm/etudiants-app/values.yaml
+      namespace: default
+
+profiles:
+  - name: dev
+    build:
+      local:
+        push: false
+      tagPolicy:
+        sha256: {}
